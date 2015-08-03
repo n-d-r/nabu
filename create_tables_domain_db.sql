@@ -1,0 +1,1 @@
+CREATE TABLE domains (url TEXT, domain TEXT);
