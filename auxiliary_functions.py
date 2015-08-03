@@ -40,13 +40,8 @@ def insert_article(article_obj):
                 cursor.execute('INSERT INTO artls_tags(artl_url, tag) \
                                 VALUES(?, ?)', (article_obj.url, keyword))            
     except sqlite3.OperationalError:
-        # to make sure that db is closed even if inserting fails
         print('OperationalError')        
-#        conn.commit()
-#        conn.close()  
     except sqlite3.IntegrityError:
-        print('IntegrityError: ' + article_obj.__str__() + '\n')
-#        conn.commit()
-#        conn.close()                          
+        print('IntegrityError: ' + article_obj.__str__() + '\n')                        
     conn.commit()                           
     conn.close()

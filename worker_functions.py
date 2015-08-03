@@ -3,7 +3,6 @@
 def retrieve_article_urls(domain_q, article_q):
     while not domain_q.empty():
         domain = domain_q.get()
-#        domain.extract_links()
         domain.get_article_urls()
         for article_obj in domain.article_obj_generator():        
             article_q.put(article_obj)
