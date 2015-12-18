@@ -14,11 +14,11 @@ def main():
     parser = argparse.ArgumentParser()
     group  = parser.add_mutually_exclusive_group()
     
-    group.add_argument('-kwf', '--keywordsfromfile', 
+    group.add_argument('-f', '--keywords-from-file', 
                         help='specify file from which to read keywords. default: \
                         \'keywords.txt\'')
                         
-    group.add_argument('-kwu', '--keywordsfromuser', 
+    group.add_argument('-u', '--keywords-from-user', 
                         help='specify keywords directly; separate keywords \
                         by commata. do NOT use spaces.')
                         
@@ -33,14 +33,14 @@ def main():
     
     # loading keywords
     print('Loading keywords...')
-    if args.keywordsfromfile:
-        with open(args.keywordsfromfile, 'r') as f:
+    if args.keywords_from_file:
+        with open(args.keywords_from_file, 'r') as f:
             flines = f.readlines()
             keywords = [kw.strip('\n') for kw in flines]
-    elif args.keywordsfromuser:
-        keywords = args.keywordsfromuser.split(',')
+    elif args.keywords_from_user:
+        keywords = args.keywords_from_user.split(',')
     else:
-        keywords = False
+        keywords = None
     print('Finished loading keywords.\n')
     
     # constants

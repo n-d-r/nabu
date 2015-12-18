@@ -1,0 +1,1 @@
+This is a small side project I have been working on. It opens the frontpages of a number of news websites, parses out the URLs to the frontpage articles, then opens those, extracts various pieces of information, and places it in a SQLite database.
