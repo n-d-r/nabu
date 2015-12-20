@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from article             import *
-from domains             import *
-from auxiliary_functions import *
-from worker_functions    import *
-from multiprocessing     import Process, Manager  
+#===============================================================================
+# Imports
+#===============================================================================
+
+from articles import (Article, EUObserverArticle, AlJazeeraArticle,
+                      ArsTechnicaArticle, SPIEGELIntlArticle, BBCNewsArticle, 
+                      EuronewsArticle, insert_article)
+from domains import (Domain, AlJazeera, EUObserver, ArsTechnica, SPIEGELIntl,
+                     BBCNews, Euronews)
+from worker_functions import (retrieve_article_urls, retrieve_article_text,
+                              scan_article_text)
+from multiprocessing import Process, Manager  
+
+#===============================================================================
+# main() below
+#===============================================================================
 
 def main():
     
@@ -72,8 +83,7 @@ def main():
     for dom_obj in domains_obj:
         domain_q.put(dom_obj)
     print('Finished retrieveing domains and domain URLs.\n')
-    
-#    check_q_content(domain_q)        
+         
         
     # extracting article URLs from domains/frontpages
     print('Extracting article URLs from domains/frontpages...')
@@ -87,8 +97,7 @@ def main():
     for process in url_processes:
         process.join()
     print('Finished extracting article URLs.\n')
-    
-#    check_q_content(article_q)        
+         
 
     # extracting text of individual articles
     print('Extracting text from individual articles...')    
@@ -103,8 +112,6 @@ def main():
         process.join()         
     print('Finished extracting text from individual articles.\n')                
 
-#    check_q_content(scan_q)
-             
     
     # scanning individual article texts for keywords
     if keywords:
@@ -162,36 +169,7 @@ def main():
             else:
                 insert_article(article_obj)
     print('Finished inserting relevant articles into database.\n')
-    
-#    check_q_content(processed_q)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+     
     
 if __name__ == '__main__':
     main()

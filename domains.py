@@ -1,12 +1,30 @@
 # -*- coding: utf-8 -*-
 
+"""
+This file contains classes to handle the individual news websites ('domains').
+"""
+
+#===============================================================================
+# Imports
+#===============================================================================
+
 import requests
 import time
 import re
 from bs4 import BeautifulSoup
 from article import *
 
-class Domain:    
+#===============================================================================
+# Class definitions
+#===============================================================================
+
+class Domain:
+    """
+    Main class for a domain. Domain, here, refers to a particular news 
+    platform, such as BBC news. It should not be used directly but inherited
+    from by domain-specific subclasses.
+    """
+
     def __init__(self):
         self.article_list = []        
         
@@ -26,9 +44,8 @@ class Domain:
         
     def get_article_urls(self):
         r = self._requests_wrapper(self.url)
-        if r == None:
+        if not r:
             pass
-            # this shoud probably delete the object in question
         else:
             soup = BeautifulSoup(r.text)
             self.extract_links(soup)
@@ -37,7 +54,14 @@ class Domain:
         for article_url in self.article_list:
             yield self.article_class(article_url, self.url)
         
+
+
 class AlJazeera(Domain):
+    """
+    Class to handle http://www.AlJazeera.com domain, includes site-specific
+    HTML parsing.
+    """
+
     def __init__(self, url):
         Domain.__init__(self)        
         self.domain = 'Al-Jazeera'          
@@ -50,14 +74,15 @@ class AlJazeera(Domain):
            self.article_list.append('http://www.aljazeera.com' + 
                                     article.get('href'))
        self.article_list = list(set(self.article_list))
-        
-#    def article_obj_generator(self):
-#        for article_url in self.article_list:
-#            yield AlJazeeraArticle(article_url, self.url)
     
     
     
 class EUObserver(Domain):
+    """
+    Class to handle http://euobserver.com domain, includes site-specific
+    HTML parsing.
+    """
+
     def __init__(self, url):
         Domain.__init__(self)          
         self.domain = 'EU Observer'        
@@ -67,22 +92,20 @@ class EUObserver(Domain):
     def extract_links(self, soup):
         regexpr = re.compile('^/[a-z]+/[0-9]+')
         articles = soup.find_all('a')
-        
         for article in articles:
             href = article.get('href')
             if not regexpr.search(href) == None:
                 self.article_list.append('http://euobserver.com' + href)
-        
         self.article_list = list(set(self.article_list))
-
-#    def article_obj_generator(self):
-#        for article_url in self.article_list:
-#            yield EUObserverArticle(article_url, self.url)
-
 
 
 
 class ArsTechnica(Domain):
+    """
+    Class to handle http://arstechnica.com domain, includes site-specific
+    HTML parsing.
+    """
+
     def __init__(self, url):
         Domain.__init__(self)
         self.domain = 'Ars Technica'
@@ -91,19 +114,18 @@ class ArsTechnica(Domain):
         
     def extract_links(self, soup):
         articles = soup.find_all('article')
-        
         for artl in articles:
             self.article_list.append(self.url + artl.a.get('href'))
-
         self.article_list = list(set(self.article_list))    
-    
-#    def article_obj_generator(self):
-#        for article_url in self.article_list:
-#            yield ArsTechnicaArticle(article_url, self.url)
 
 
 
 class SPIEGELIntl(Domain):
+    """
+    Class to handle http://www.spiegel.de domain, includes site-specific
+    HTML parsing.
+    """
+
     def __init__(self, url):
         Domain.__init__(self)
         self.domain = 'SPIEGEL Intl'
@@ -114,24 +136,24 @@ class SPIEGELIntl(Domain):
         # main articles        
         artls = soup.find_all(attrs={'class': 'article-title'})
         for artl in artls:
-            self.article_list.append('http://www.spiegel.de' + artl.a.get('href'))
+            self.article_list.append('http://www.spiegel.de' + 
+                                     artl.a.get('href'))
         
         # 'Recent stories' articles (in sidebar on the right)
         recent_stories = soup.find(attrs={'class': 'asset-box asset-list-box \
         clearfix'}).find_all('a')
         for artl in recent_stories:
             self.article_list.append('http://www.spiegel.de' + artl.get('href'))
-            
         self.article_list = list(set(self.article_list))
-        
-    
-#    def article_obj_generator(self):
-#        for article_url in self.article_list:
-#            yield SPIEGELIntlArticle(article_url, self.url)
             
             
             
 class BBCNews(Domain):
+    """
+    Class to handle http://www.bbc.com/news domain, includes site-specific
+    HTML parsing.
+    """
+
     def __init__(self, url):
         Domain.__init__(self)
         self.domain = 'BBC News'
@@ -140,20 +162,22 @@ class BBCNews(Domain):
         
     def extract_links(self, soup):
         a = soup.find_all(attrs={'type': 'application/ld+json'})           
-        regex = re.compile('http://www.bbc.com/news/[a-z]+-[a-z]*-*[a-z]*-*[a-z0-9]+/')
+        regex = re.compile(
+            'http://www.bbc.com/news/[a-z]+-[a-z]*-*[a-z]*-*[a-z0-9]+/'
+        )
         self.article_list = list(set(regex.findall(str(a[1]))))
         # note: there are (usually) two matches found by the first line,
         # the second of which should contain the script including all
         # relevant URLs.
-                            
-    
-#    def article_obj_generator(self):
-#        for article_url in self.article_list:
-#            yield BBCNewsArticle(article_url, self.url)
             
             
             
 class Euronews(Domain):
+    """
+    Class to handle http://www.euronews.com domain, includes site-specific
+    HTML parsing.
+    """
+
     def __init__(self, url):
         Domain.__init__(self)
         self.domain = 'euronews'
@@ -167,14 +191,28 @@ class Euronews(Domain):
         for artl in artls:
             self.article_list.append('http://www.euronews.com' + \
                 artl.a.get('href'))
-        self.article_list = list(set(self.article_list))
-            
+        self.article_list = list(set(self.article_list))     
 
-#    def article_obj_generator(self):
-#        for article_url in self.article_list:
-#            yield EuronewsArticle(article_url, self.url)            
+#===============================================================================
+# Functions
+#===============================================================================
 
+def select_domains(how_many=None):
+    """
+    Retrieves the stored domains which are to be scraped from the database.
+    Argument how_many limits the number of retrieved domains and is used 
+    only for testing/debugging.
+    """
 
-
-
-                 
+    conn = sqlite3.connect('domain_db.db')
+    cursor = conn.cursor()
+    if how_many: 
+        cursor.execute('SELECT * FROM domains LIMIT ?', (how_many, ))
+    else:
+        cursor.execute('SELECT * FROM domains')
+    data = cursor.fetchall()
+    conn.close()
+    for tup in data:
+        if tup[0] == None:
+            del data[data.index(tup)]
+    return data
