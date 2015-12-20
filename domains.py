@@ -12,7 +12,10 @@ import requests
 import time
 import re
 from bs4 import BeautifulSoup
-from article import *
+
+from articles import (Article, EUObserverArticle, AlJazeeraArticle,
+                      ArsTechnicaArticle, SPIEGELIntlArticle, BBCNewsArticle, 
+                      EuronewsArticle)
 
 #===============================================================================
 # Class definitions
