@@ -4,14 +4,15 @@
 # Imports
 #===============================================================================
 
+from multiprocessing import Process, Manager  
+
 from articles import (Article, EUObserverArticle, AlJazeeraArticle,
                       ArsTechnicaArticle, SPIEGELIntlArticle, BBCNewsArticle, 
                       EuronewsArticle, insert_article)
 from domains import (Domain, AlJazeera, EUObserver, ArsTechnica, SPIEGELIntl,
-                     BBCNews, Euronews)
+                     BBCNews, Euronews, select_domains, DOMAIN_CLASSES)
 from worker_functions import (retrieve_article_urls, retrieve_article_text,
                               scan_article_text)
-from multiprocessing import Process, Manager  
 
 #===============================================================================
 # main() below
@@ -68,20 +69,13 @@ def main():
 
     # retrieving saved domains and domain URLs
     print('Retrieving domains and domain URLs...')
-    domains_dict = {'Al-Jazeera': AlJazeera,
-                    'EUObserver': EUObserver,
-                    'ArsTechnica': ArsTechnica,
-                    'SPIEGEL Intl': SPIEGELIntl,
-                    'BBC News': BBCNews,
-                    'euronews': Euronews}
-                   
-    domains_raw = select_domains(how_many=1)
-#    domains_raw = select_domains()
-    domains_obj = [domains_dict[domain_tuple[1]](domain_tuple[0]) for \
-                   domain_tuple in domains_raw]
+
+    domain_tuples = select_domains(how_many=1)
+#    domain_tuples = select_domains()
+    domains = [DOMAIN_CLASSES[name](url) for url, name in domain_tuples]
     
-    for dom_obj in domains_obj:
-        domain_q.put(dom_obj)
+    for domain in domains:
+        domain_q.put(domain)
     print('Finished retrieveing domains and domain URLs.\n')
          
         
