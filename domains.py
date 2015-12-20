@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-This file contains classes to handle the individual news websites ('domains').
+This file contains classes to handle the individual news websites ('domains'). 
+It also includes domain-related functions and constants.
 """
 
 #===============================================================================
@@ -11,6 +12,7 @@ This file contains classes to handle the individual news websites ('domains').
 import requests
 import time
 import re
+import sqlite3
 from bs4 import BeautifulSoup
 
 from articles import (Article, EUObserverArticle, AlJazeeraArticle,
@@ -215,7 +217,16 @@ def select_domains(how_many=None):
         cursor.execute('SELECT * FROM domains')
     data = cursor.fetchall()
     conn.close()
-    for tup in data:
-        if tup[0] == None:
-            del data[data.index(tup)]
+    data = [tup for tup in data if tup[0] is not None]            
     return data
+
+#===============================================================================
+# Constants
+#===============================================================================
+
+DOMAIN_CLASSES = {'Al-Jazeera': AlJazeera,
+                  'EUObserver': EUObserver,
+                  'ArsTechnica': ArsTechnica,
+                  'SPIEGEL Intl': SPIEGELIntl,
+                  'BBC News': BBCNews,
+                  'euronews': Euronews}    
