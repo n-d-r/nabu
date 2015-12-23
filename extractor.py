@@ -21,7 +21,7 @@ class KeywordExtractor(ParallelProcessor):
   def __init__(self):
     super(KeywordExtractor, self).__init__()
 
-  def _lf(keywords, text):
+  def _lf(self, keywords, text):
     found_keywords = []
     text_stripped = ''.join(
       [char for char in text if char not in '\'.,()[]{}\"']
@@ -32,7 +32,7 @@ class KeywordExtractor(ParallelProcessor):
         found_keywords.append(keyword)
     return list(set(found_keywords))
 
-  def _look_for(to_process_q, processed_q, **kwargs):
+  def _look_for(self, to_process_q, processed_q, **kwargs):
     while not to_process_q.empty():
       article_object = to_process_q.get()
       article_object.keywords = self._lf(kwargs['keywords'], 
