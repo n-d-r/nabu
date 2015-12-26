@@ -4,10 +4,17 @@ class ArgumentValidator(object):
     pass
 
   @staticmethod
-  def validate(input, type, startswith=None, endswith=None, contains=None):
-    if not isinstance(input, type):
-      raise Exception('"{}" is not of type "{}"'.format(input, type))
-    elif startswith:
+  def validate(input, target_type, startswith=None, 
+               endswith=None, contains=None):
+    if isinstance(target_type, list) or isinstance(target_type, tuple):
+      if not any(isinstance(input, t) for t in target_type):
+        raise Exception('"{}" is not of any acceptable type "{}"'.format(input, 
+                        ', '.join([str(t) for t in target_type])))
+    else:
+      if not isinstance(input, target_type):
+        raise Exception('"{}" is not of type "{}"'.format(input, target_type))
+
+    if startswith:
       if not input.startswith(startswith):
         raise Exception('"{}" does not start with "{}"'
                         .format(input, startswith))
