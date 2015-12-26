@@ -199,28 +199,6 @@ class Euronews(Domain):
         self.article_list = list(set(self.article_list))     
 
 #===============================================================================
-# Functions
-#===============================================================================
-
-def select_domains(how_many=None):
-    """
-    Retrieves the stored domains which are to be scraped from the database.
-    Argument how_many limits the number of retrieved domains and is used 
-    only for testing/debugging.
-    """
-
-    conn = sqlite3.connect('domain_db.db')
-    cursor = conn.cursor()
-    if how_many: 
-        cursor.execute('SELECT * FROM domains LIMIT ?', (how_many, ))
-    else:
-        cursor.execute('SELECT * FROM domains')
-    data = cursor.fetchall()
-    conn.close()
-    data = [tup for tup in data if tup[0] is not None]            
-    return data
-
-#===============================================================================
 # Constants
 #===============================================================================
 

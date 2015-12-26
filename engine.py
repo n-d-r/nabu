@@ -15,6 +15,7 @@ from multiprocessing import Process, Manager
 from extractor import KeywordExtractor
 from parallelprocessor import ParallelProcessor
 from validator import ArgumentValidator
+from domains import DOMAIN_CLASSES
 
 #===============================================================================
 # Class definition
@@ -31,12 +32,13 @@ class Engine(ParallelProcessor):
     self.article_q = self.manager.Queue()
     self.scan_q = self.manager.Queue()
     self.processed_q = self.manager.Queue()
-    self.keywords = keywords
 
     ArgumentValidator.validate(article_database, type=str, endswith='.db')
     ArgumentValidator.validate(domain_database, type=str, endswith='.db')
+    ArgumentValidator.validate(keywords, type=list)
     self.article_database = article_database
     self.domain_database = domain_database
+    self.keywords = keywords
 
   def process_keywords(self, to_process_q, processed_q):
     extractor = KeywordExtractor()
@@ -52,7 +54,26 @@ class Engine(ParallelProcessor):
         processed_q=self.processed_q
       )
 
-  def prepare_domains(self, domains):
+  def _select_domains(self, how_many=None):
+      """
+      Retrieves the stored domains which are to be scraped from the database.
+      Argument how_many limits the number of retrieved domains and is used 
+      only for testing/debugging.
+      """
+      conn = sqlite3.connect(self.domain_database)
+      cursor = conn.cursor()
+      if how_many: 
+          cursor.execute('SELECT * FROM domains LIMIT ?', (how_many, ))
+      else:
+          cursor.execute('SELECT * FROM domains')
+      data = cursor.fetchall()
+      conn.close()
+      data = [tup for tup in data if tup[0] is not None]            
+      return data
+
+  def load_domains(self, how_many=None):
+    domain_tuples = self._select_domains(how_many)
+    domains = [DOMAIN_CLASSES[name](url) for url, name in domain_tuples]
     for domain in domains:
       self.domain_q.put(domain)
 

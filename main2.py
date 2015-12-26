@@ -21,6 +21,9 @@ from engine import Engine
 
 def main():
 
+  article_database = 'articles.db'
+  domain_database = 'domain_db.db'
+
   import argparse
   parser = argparse.ArgumentParser()
   group = parser.add_mutually_exclusive_group()
@@ -56,11 +59,8 @@ def main():
   else:
     keywords = None
 
-  domain_tuples = select_domains(how_many=3)
-  domains = [DOMAIN_CLASSES[name](url) for url, name in domain_tuples]
-
-  engine = Engine(keywords=keywords)
-  engine.prepare_domains(domains=domains)
+  engine = Engine(keywords, article_database, domain_database)
+  engine.load_domains(how_many=1)
   engine.execute(
     function=retrieve_article_urls,
     to_process_q=engine.domain_q,
