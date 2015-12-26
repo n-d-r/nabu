@@ -75,5 +75,7 @@ def main():
     to_process_q=engine.scan_q,
     processed_q=engine.processed_q
   )
+  engine.insert_articles(processed_q)
 
-  # To be continued...
+if __name__ == '__main__':
+  main()  
