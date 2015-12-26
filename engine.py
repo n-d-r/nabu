@@ -11,6 +11,8 @@ the main() function in main.py
 # Imports
 #===============================================================================
 
+import sqlite3
+
 from multiprocessing import Process, Manager
 from extractor import KeywordExtractor
 from parallelprocessor import ParallelProcessor
@@ -33,12 +35,19 @@ class Engine(ParallelProcessor):
     self.scan_q = self.manager.Queue()
     self.processed_q = self.manager.Queue()
 
-    ArgumentValidator.validate(article_database, type=str, endswith='.db')
-    ArgumentValidator.validate(domain_database, type=str, endswith='.db')
-    ArgumentValidator.validate(keywords, type=list)
+    ArgumentValidator.validate(
+      article_database, target_type=str, endswith='.db'
+    )
     self.article_database = article_database
+
+    ArgumentValidator.validate(
+      domain_database, target_type=str, endswith='.db'
+    )
     self.domain_database = domain_database
-    self.keywords = keywords
+
+    if keywords:
+      ArgumentValidator.validate(keywords, target_type=list)
+      self.keywords = keywords
 
   def process_keywords(self, to_process_q, processed_q):
     extractor = KeywordExtractor()
@@ -102,7 +111,7 @@ class Engine(ParallelProcessor):
     while not to_process_q.empty():
       try:
         article_object = to_process_q.get()
-        ArgumentValidator.validate(article_object, type=Article)
+        ArgumentValidator.validate(article_object, target_type=Article)
         self._insert(article_object)
       except sqlite.IntegrityError:
         print('IntegrityError: {}\n'.format(article_object))
