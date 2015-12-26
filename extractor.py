@@ -35,8 +35,8 @@ class KeywordExtractor(ParallelProcessor):
   def _look_for(self, to_process_q, processed_q, **kwargs):
     while not to_process_q.empty():
       article_object = to_process_q.get()
-      article_object.keywords = self._lf(kwargs['keywords'], 
-                                         article_object.text)
+      article_object.found_keywords = self._lf(kwargs['keywords'], 
+                                               article_object.text)
       processed_q.put(article_object)
 
   def look_for_keywords(self, keywords, to_process_q, processed_q):
