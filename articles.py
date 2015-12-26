@@ -12,13 +12,14 @@ such objects.
 
 import requests  
 import time
+import sqlite3
 from bs4 import BeautifulSoup
 
 #===============================================================================
 # Class definitions
 #===============================================================================
 
-class Article:
+class Article(object):
     """
     Base class, provides basic functionality for processing of articles.
     Each object instance should represent one article from a particular

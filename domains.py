@@ -23,7 +23,7 @@ from articles import (Article, EUObserverArticle, AlJazeeraArticle,
 # Class definitions
 #===============================================================================
 
-class Domain:
+class Domain(object):
     """
     Main class for a domain. Domain, here, refers to a particular news 
     platform, such as BBC news. It should not be used directly but inherited
