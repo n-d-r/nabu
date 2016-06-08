@@ -1,12 +1,3 @@
-"""
-I am currently in the process of refactoring the main() function from main.py
-into several classes, including the KeywordExtractor and Engine classes, to 
-make the code cleaner and more readable. 
-
-The Engine class will do most of the heavy lifting that is currently part of
-the main() function in main.py
-"""
-
 #===============================================================================
 # Imports
 #===============================================================================
