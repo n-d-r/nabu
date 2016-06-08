@@ -18,6 +18,7 @@ from extractor import KeywordExtractor
 from parallelprocessor import ParallelProcessor
 from validator import ArgumentValidator
 from domains import DOMAIN_CLASSES
+from articles import Article
 
 #===============================================================================
 # Class definition
@@ -34,6 +35,7 @@ class Engine(ParallelProcessor):
     self.article_q = self.manager.Queue()
     self.scan_q = self.manager.Queue()
     self.processed_q = self.manager.Queue()
+    self.keywords = []
 
     ArgumentValidator.validate(
       article_database, target_type=str, endswith='.db'
@@ -54,13 +56,13 @@ class Engine(ParallelProcessor):
     if self.keywords:
       extractor.look_for_keywords(
         keywords=self.keywords,
-        to_process_q=self.to_process_q,
-        processed_q=self.processed_q
+        to_process_q=to_process_q,
+        processed_q=processed_q
       )
     else:
       extractor.extract_keywords(
-        to_process_q=self.to_process_q,
-        processed_q=self.processed_q
+        to_process_q=to_process_q,
+        processed_q=processed_q
       )
 
   def _select_domains(self, how_many=None):
@@ -86,7 +88,7 @@ class Engine(ParallelProcessor):
     for domain in domains:
       self.domain_q.put(domain)
 
-  def _insert_keyword(url, keyword):
+  def _insert_keyword(self, url, keyword):
     command = """
       INSERT INTO artls_tags(artl_url, tag)
       VALUES ("{}", "{}")
@@ -94,7 +96,7 @@ class Engine(ParallelProcessor):
     data = [url, keyword]
     self.cursor.execute(command.format(*data))
 
-  def _insert(article_object):
+  def _insert(self, article_object):
     command = """
       INSERT INTO artls(title, url, domain, domain_url, date, time)
       VALUES("{}", "{}", "{}", "{}", date(), time())
@@ -105,15 +107,15 @@ class Engine(ParallelProcessor):
     for keyword in article_object.found_keywords:
       self._insert_keyword(article_object.url, keyword)
 
-  def insert_articles(to_process_q):
+  def insert_articles(self, to_process_q):
     self.conn = sqlite3.connect(self.article_database)
-    self.cursor = conn.cursor()
+    self.cursor = self.conn.cursor()
     while not to_process_q.empty():
       try:
         article_object = to_process_q.get()
         ArgumentValidator.validate(article_object, target_type=Article)
         self._insert(article_object)
-      except sqlite.IntegrityError:
+      except sqlite3.IntegrityError:
         print('IntegrityError: {}\n'.format(article_object))
       except sqlite3.OperationalError:
         print('OperationalError: {}\n'.format(article_object))
