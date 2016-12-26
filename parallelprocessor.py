@@ -1,8 +1,4 @@
 """
-I am currently in the process of refactoring the main() function from main.py
-into several classes, including the KeywordExtractor and Engine classes, to 
-make the code cleaner and more readable. 
-
 The ParallelProcessor class is simply there to be inherited from by the
 Engine and KeywordExtractor classes that both need the execute() method.
 """
